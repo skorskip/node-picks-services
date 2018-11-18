@@ -1,4 +1,6 @@
 # node-picks-services
 
 To Run:
-node server.js
+- start mysql
+- ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password'
+- node server.js
