@@ -1,4 +1,4 @@
 # node-picks-services
 
-#To Run:
+To Run:
 node server.js
