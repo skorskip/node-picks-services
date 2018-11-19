@@ -16,9 +16,11 @@ exports.getListGames = function(req, res) {
 };
 
 exports.addGame = function(req, res) {
+    console.log(req.body);
     var newGame = new Game(req.body);
+    console.log(newGame);
     //handles null error 
-    if(!newGame.homeTeam){
+    if(newGame.homeTeam == ""){
         res.status(400).send({ error:true, message: 'Please provide game' });
     }
     else{

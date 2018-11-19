@@ -15,12 +15,13 @@ var Game = function(game){
 };
 Game.addGame = function addGame(newGame, result) {    
     sql.query("INSERT INTO games set ?", newGame, function (err, res) {
+        console.log(newGame);
         if(err) result(err, null);
         else result(null, res.insertId);
     });           
 };
 Game.getGameById = function getGameById(gameId, result) {
-    sql.query("Select task from tasks where id = ? ", gameId, function (err, res) {             
+    sql.query("Select * from games where id = ? ", gameId, function (err, res) {             
         if(err)result(err, null);
         else result(null, res);
     });   
@@ -63,7 +64,7 @@ Game.updateById = function(id, game, result){
     }); 
 };
 Game.remove = function(id, result){
-    sql.query("DELETE FROM tasks WHERE id = ?", [id], function (err, res) {
+    sql.query("DELETE FROM games WHERE id = ?", [id], function (err, res) {
         if(err) result(null, err);
         else result(null, res);
     }); 

@@ -1,5 +1,6 @@
-var express = require('express')
-var app = express()
+var express = require('express');
+var bodyParser = require('body-parser');
+var app = express();
 var port = process.env.PORT || 3000;
 
 const mysql = require('mysql');
@@ -7,8 +8,8 @@ const mysql = require('mysql');
 const mc = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '',
-    database: 'mydb'
+    password: '********',
+    database: 'pickem'
 });
 
 // connect to database
