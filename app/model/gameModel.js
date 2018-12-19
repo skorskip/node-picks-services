@@ -1,21 +1,22 @@
 'user strict';
 var sql = require('./db.js');
 
-//Task object constructor
 var Game = function(game){
-    this.date       = game.date;
-    this.submitDate = game.submitDate;
-    this.homeTeam   = game.homeTeam;
-    this.awayTeam   = game.awayTeam;
-    this.homeScore  = game.homeScore;
-    this.awayScore  = game.awayScore;
-    this.spread     = game.spread;
-    this.progress   = game.progress;
-    this.isOn       = game.isOn;
+    this.lastUpdated    = game.lastUpdated;
+    this.date           = game.date;
+    this.week           = game.week;
+    this.season         = game.season;
+    this.submitDate     = game.submitDate;
+    this.homeTeam       = game.homeTeam;
+    this.awayTeam       = game.awayTeam;
+    this.homeScore      = game.homeScore;
+    this.awayScore      = game.awayScore;
+    this.spread         = game.spread;
+    this.progress       = game.progress;
+    this.isOn           = game.isOn;
 };
 Game.addGame = function addGame(newGame, result) {    
     sql.query("INSERT INTO games set ?", newGame, function (err, res) {
-        console.log(newGame);
         if(err) result(err, null);
         else result(null, res.insertId);
     });           
@@ -38,7 +39,10 @@ Game.getListGames = function getListGames(listGames, result) {
 };
 Game.updateById = function(id, game, result){
     var query = "UPDATE games SET " +
+                "lastUpdated = ?" +
                 "date = ? " + 
+                "week = ? " +
+                "season = ? " +
                 "submitDate = ?" +
                 "homeTeam = ? " +
                 "awayTeam = ? " +
@@ -48,7 +52,11 @@ Game.updateById = function(id, game, result){
                 "progress = ? " +
                 "isOn = ? " +
                 "WHERE id = ?";
-    sql.query(query, [game.date, 
+    sql.query(query, [
+        game.lastUpdated,
+        game.date, 
+        game.week,
+        game.season,
         game.submitDate, 
         game.homeTeam,
         game.awayTeam,

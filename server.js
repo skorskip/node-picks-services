@@ -8,7 +8,7 @@ const mysql = require('mysql');
 const mc = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '********',
+    password: '*****',
     database: 'pickem'
 });
 
@@ -22,5 +22,5 @@ console.log('API server started on: ' + port);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-var routes = require('./app/routes/gameRoutes'); //importing route
+var routes = require('./app/routes/routes'); //importing route
 routes(app); //register the route
