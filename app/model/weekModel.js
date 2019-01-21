@@ -6,7 +6,7 @@ var Data = require('../model/dataModel.js');
 var Week = {};
 
 Week.getWeek = function getTeamById(season, week, result) {
-    this.populateWeekData();
+    this.populateWeekData(season, week);
     sql.query("SELECT * FROM games where season = ? AND week = ?", [season, week], function(err, res){
         if(err) result(err, null);
         else result(null,res);
@@ -17,9 +17,12 @@ Week.updateWeek = function updateWeek(){
 
 };
 
-Week.populateWeekData = function populateWeekData(){
-    //first check to see if it has been populated today
-        //if not update the week
+Week.populateWeekData = function populateWeekData(season, week){
+    var data;
+    Data.getWeekData(season, week, function(err, data){
+        if(err) console.log(error);
+        else Game.insertWeekData(data)
+    })
 };
 
 

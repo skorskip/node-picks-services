@@ -33,7 +33,7 @@ Game.getListGames = function getListGames(listGames, result) {
         list = list + "'" + gameId + "'" + ','; 
     });
     sql.query("Select * from games where id IN = ?", list, function (err, res) {
-        if(err) result(null, err);
+        if(err) result(err, null);
         else result(null, res);
     });   
 };
@@ -67,15 +67,33 @@ Game.updateById = function(id, game, result){
         game.isOn,
         id], function (err, res) {
 
-        if(err) result(null, err);
+        if(err) result(err, null);
         else result(null, res);
     }); 
 };
 Game.remove = function(id, result){
     sql.query("DELETE FROM games WHERE id = ?", [id], function (err, res) {
-        if(err) result(null, err);
+        if(err) result(err, null);
         else result(null, res);
     }); 
 };
+Game.insertWeekData = function(data, result){
+    var games = data.games;
+    games.array.forEach(game => {
+        var game = gameMapper(game.schedule, game.score);
+        Game.addGame(game, function(err, result){
+            if(err) result(err, null);
+        });
+    })
+}
+
+function gameMapper(game, score){
+    var gameMapped;
+    
+    
+    return 
+}
+
+
 
 module.exports= Game;
