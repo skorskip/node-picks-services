@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var config = require('../../config.json');
+var config = require('./config.json');
 var app = express();
 var port = process.env.PORT || 3000;
 

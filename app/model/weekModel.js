@@ -18,10 +18,12 @@ Week.updateWeek = function updateWeek(){
 };
 
 Week.populateWeekData = function populateWeekData(season, week){
-    var data;
     Data.getWeekData(season, week, function(err, data){
-        if(err) console.log(error);
-        else Game.insertWeekData(data)
+        if(err) console.log(err);
+        else Game.insertAPIData(data, function(err, result){
+            if(err) console.log("ERROR:", err);
+            else console.log(result);
+        })
     })
 };
 
