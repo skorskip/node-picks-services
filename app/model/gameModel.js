@@ -38,6 +38,7 @@ Game.getListGames = function getListGames(listGames, result) {
         else result(null, res);
     });   
 };
+
 Game.updateById = function(id, game, result){
     var query = "UPDATE games SET " +
                 "lastUpdated = ?" +
@@ -80,32 +81,94 @@ Game.remove = function(id, result){
     }); 
 };
 
-Game.insertAPIData = function(data, result) {
+Game.insertAPIData = function(data, week, season, result) {
     var data = JSON.parse(data);
     var games = data.games;
-    games.forEach(game => {
-        Game.gameMapper(game.schedule, game.score, function(err, gameMapped) {
-            console.log('INSERT GAME:', gameMapped);
-            Game.addGame(gameMapped, function(err, res){
-                if(err) result(err, null);
-                else result(null, res);
+    var insertGames = new Promise((resolve, reject) => {
+        games.forEach(game => {
+            Game.gameMapper(game.schedule, week, season, game.score, function(err, gameMapped) {
+                Game.addGame(gameMapped, function(err, res){
+                    if(err) reject(result(err, null));
+                    resolve(res);
+                });
             });
         });
     });
+
+    insertGames.then(()=>{
+        Game.editSubmitDate(week, season, function(err, updateResult){
+            if(err) result(err, null);
+            result(null, updateResult);
+        });
+    })
 };
 
-Game.gameMapper = function(game, score, result) {
+Game.editSubmitDate = function(week, season, result) {
+    Game.getSubmitDateMap(week, season, function(err, dates){
+        var updateDates = new Promise((resolve, reject)=>{
+            for(var [key, value] of dates){
+                sql.query("UPDATE games SET submitDate = ? WHERE id in (?)", [key, value], function(err, res){
+                    if(err) reject(err);
+                    resolve(res);
+                });
+            }
+        });
+        updateDates.then(()=>{
+            result(null, "UPDATES SUBMIT DATES");
+        })
+    });
+}
+
+Game.getSubmitDateMap = function(week, season, result) {
+    var dateMap = new Map();
+    sql.query("SELECT * FROM games WHERE week = ? AND season = ? ORDER BY date", [week, season], function(err, games) {
+        if(err) result(err, null);
+        else {
+            var createMap = new Promise((resolve, reject) => {
+                var i = 0;
+                games.forEach(game => {
+                    if(i != 0){
+                        var submitDateCurr = new Date(game.submitDate);
+                        var submitDatePast = new Date (games[i - 1].submitDate);
+                        if(submitDateCurr.getDay() != submitDatePast.getDay()){
+                            var dateList = [];
+                            lastKey = game.submitDate;
+                            dateList.push(game.id);
+                            dateMap.set(lastKey, dateList);
+                        } else {
+                            dateMap.get(lastKey).push(game.id);
+                        }
+                    } else {
+                        var dateList = [];
+                        lastKey = game.submitDate;
+                        dateList.push(game.id);
+                        dateMap.set(lastKey, dateList);
+                    }
+                    i++;
+                    resolve();
+                });
+            });
+
+            createMap.then(()=>{
+                result(null, dateMap);
+            });
+        }
+    });
+}
+
+Game.gameMapper = function(game, week, season, score, result) {
     var gameMapped = {};
     gameMapped.id = game.id;
-    gameMapped.week = game.week;
-    gameMapped.date = JSON.stringify(game.startTime);
-    gameMapped.progress = JSON.stringify(game.playedStatus);
+    //gameMapped.lastUpdated = new Date();
+    gameMapped.week = week;
+    gameMapped.date = new Date(String(game.startTime));
+    gameMapped.progress = String(game.playedStatus);
     gameMapped.awayScore = score.awayScoreTotal;
     gameMapped.homeScore = score.homeScoreTotal;
-    gameMapped.submitDate = "";
+    gameMapped.submitDate = new Date(String(game.startTime));
     gameMapped.isOn = true;
-    gameMapped.spread = 7;
-    gameMapped.season = 2018;
+    gameMapped.spread = 0;
+    gameMapped.season = season;
 
     Team.getTeamByAbbrev(game.awayTeam.abbreviation, function(err, awayTeams) {
         if(err) result(err, null);
@@ -119,16 +182,12 @@ Game.gameMapper = function(game, score, result) {
                             gameMapped.homeTeam = homeTeams[0].id;
                             result(null, gameMapped);
                         } else {
-                            //LA
-                            //JAX
-                            console.log("MISSING TEAM:", game.homeTeam.abbreviation)
                             result("MISSING TEAM", null)
                         }
                     }
                 })
             }
             else {
-                console.log("MISSING TEAM:", game.awayTeam.abbreviation)
                 result("MISSING TEAM", null)
             }
         }
