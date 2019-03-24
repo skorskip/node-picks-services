@@ -8,15 +8,15 @@ var Team = function(team){
     this.name           = team.name;
 };
 
-Team.getTeam = function getTeamById(teamId, result) {
+Team.getTeam = function getTeam(teamId, result) {
     sql.query("SELECT * FROM teams where id = ? ", teamId, function(err, res){
         if(err) result(err, null);
         else result(null, res);
     });
 };
 
-Team.getAllTeams = function getAllTeams(result) {
-    sql.query("SELCT * FROM teams", function(err, res){
+Team.getAllTeams = function getAllTeams(req, result) {
+    sql.query("SELECT * FROM teams", req, function(err, res){
         if(err) result(err, null);
         else result(null, res);
     });
@@ -28,6 +28,13 @@ Team.getTeamByAbbrev = function getTeamByAbbrev(teamAbbrev, result) {
         else result(null,res);
     });
 };
+
+Team.getTeamsById = function getTeamsById(teamIds, result) {
+    sql.query("SELECT * FROM teams WHERE id in (?)", [teamIds], function(err, res){
+        if(err) result(err, null);
+        else result(null, res);
+    });
+}
 
 module.exports= Team;
 

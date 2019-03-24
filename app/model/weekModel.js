@@ -26,6 +26,27 @@ Week.getWeek = function getWeek(season, week, result){
     });
 }
 
+Week.getCurrentWeek = function getCurrentWeek(req, result) {
+    var currWeek;
+    var currSeason;
+    var currDate = new Date();
+    sql.query("SELECT * FROM games WHERE date in (SELECT MAX(date) FROM games)", req, function(err, res){
+        if(err) result(err, null);
+        else {
+            currSeason = res[0].season;
+            if(res[0].week < 17 && currDate > res[0].date) {
+                currWeek = res[0].week + 1;
+            } else {
+                currWeek = res[0].week;
+            }
+            Week.getWeek(currSeason, currWeek, function(err, games){
+                if(err) result(err,null);
+                else result(null,games);
+            });
+        }
+    });
+}
+
 Week.getWeekSQL = function getWeekSQL(season, week, result) {
     sql.query("SELECT * FROM games where season = ? AND week = ?", [season, week], function(err, res){
         if(err) result(err, null);
@@ -44,7 +65,6 @@ Week.populateWeekData = function populateWeekData(season, week, result){
             Game.insertAPIData(data, week, season, function(err, res){
                 if(err) result(err, null);
                 else {
-                    console.log("RESULT:", res);
                     result(null, res);
                 }
             });

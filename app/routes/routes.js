@@ -22,11 +22,12 @@ module.exports = function(app) {
 
 /*<---------TEAMS---------->*/
     app.route('/teams')
-        .get(teams.getAllTeams);
+        .get(teams.getAllTeams)
+        .post(teams.getTeamsById);
 
     app.route('/teams/:teamId')
         .get(teams.getTeam);
 
-    app.route('/teams/abbrev/:teamAbbrev')
+    app.route('/teams/abbrv/:teamAbbrev')
         .get(teams.getTeamByAbbrev);
 };

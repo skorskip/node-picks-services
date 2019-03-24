@@ -1,16 +1,16 @@
 'use strict';
 
-var Team = require('../model/gameModel.js');
+var Team = require('../model/teamModel.js');
 
 exports.getTeam = function(req, res) {
-    Team.getTeamById(req.params.teamId, function(err, team) {
+    Team.getTeam(req.params.teamId, function(err, team) {
         if (err) res.send(err);
         res.json(team);
     });
 };
 
-exports.getAllTeams = function(res) {
-    Team.getAllTeams(function(err, teams) {
+exports.getAllTeams = function(req, res) {
+    Team.getAllTeams(req, function(err, teams) {
         if (err) res.send(err);
         res.json(teams);
     });
@@ -20,5 +20,12 @@ exports.getTeamByAbbrev = function(req, res){
     Team.getTeamByAbbrev(req.params.teamAbbrev, function(err, team) {
         if(err) res.send(err);
         res.json(team);
+    })
+};
+
+exports.getTeamsById = function(req, res) {
+    Team.getTeamsById(req.body, function(err, teams) {
+        if(err) res.send(err);
+        res.json(teams);
     })
 };

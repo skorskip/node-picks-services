@@ -2,8 +2,8 @@
 
 var Week = require('../model/weekModel.js');
 
-exports.getCurrentWeek = function(res) {
-    Week.getCurrentWeek(function(err, week) {
+exports.getCurrentWeek = function(req, res) {
+    Week.getCurrentWeek(req, function(err, week) {
         if (err) res.send(err);
         res.json(week);
     });
