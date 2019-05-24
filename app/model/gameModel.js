@@ -87,6 +87,7 @@ Game.insertAPIData = function(data, week, season, result) {
     var insertGames = new Promise((resolve, reject) => {
         games.forEach(game => {
             Game.gameMapper(game.schedule, week, season, game.score, function(err, gameMapped) {
+                if(err) reject(result(err, null));
                 Game.addGame(gameMapped, function(err, res){
                     if(err) reject(result(err, null));
                     resolve(res);
@@ -167,30 +168,36 @@ Game.gameMapper = function(game, week, season, score, result) {
     gameMapped.homeScore = score.homeScoreTotal;
     gameMapped.submitDate = new Date(String(game.startTime));
     gameMapped.isOn = true;
-    gameMapped.spread = 0;
+    gameMapped.spread = -1;
     gameMapped.season = season;
 
-    Team.getTeamByAbbrev(game.awayTeam.abbreviation, function(err, awayTeams) {
-        if(err) result(err, null);
-        else {
-            if(awayTeams[0] != null){
-                gameMapped.awayTeam = awayTeams[0].id;
-                Team.getTeamByAbbrev(game.homeTeam.abbreviation, function(err, homeTeams) { 
-                    if(err) result(err, null);
-                    else {
-                        if(homeTeams[0] != null){
-                            gameMapped.homeTeam = homeTeams[0].id;
-                            result(null, gameMapped);
-                        } else {
-                            result("MISSING TEAM", null)
-                        }
-                    }
-                })
-            }
+    var getAwayTeam = new Promise((resolve, reject) => {
+        Team.getTeamByAbbrev(game.awayTeam.abbreviation, function(err, awayTeams) {
+            if(err) result(err, null);
             else {
-                result("MISSING TEAM", null)
+                if(awayTeams[0] != null){
+                    resolve(gameMapped.awayTeam = awayTeams[0].id);
+                }
+                else {
+                    reject(result("MISSING TEAM: " + game.awayTeam.abbreviation, null));
+                }
             }
-        }
+        });
+    });
+
+
+    getAwayTeam.then(() => {
+        Team.getTeamByAbbrev(game.homeTeam.abbreviation, function(err, homeTeams) { 
+            if(err) result(err, null);
+            else {
+                if(homeTeams[0] != null){
+                    gameMapped.homeTeam = homeTeams[0].id;
+                    result(null, gameMapped);
+                } else {
+                    result("MISSING TEAM: " + game.homeTeam.abbreviation, null);
+                }
+            }
+        })
     });
 };
 

@@ -14,10 +14,10 @@ module.exports = function(app) {
         .delete(games.deleteGame);
         
 /*<---------WEEKS---------->*/
-    app.route('/week/current')
+    app.route('/weeks/current')
         .get(week.getCurrentWeek);
 
-    app.route('/week/season/:season/week/:week')
+    app.route('/weeks/season/:season/week/:week')
         .get(week.getWeek);
 
 /*<---------TEAMS---------->*/
