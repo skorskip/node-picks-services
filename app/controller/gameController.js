@@ -2,15 +2,15 @@
 
 var Game = require('../model/gameModel.js');
 
-exports.getListGames = function(req, res) {
+exports.getGamesById = function(req, res) {
     var listGames = req.body;
     if(listGames.length == 0){
         res.status(400).send({ error:true, message: 'Please provide list of game ids' });
     }
     else{
-        Game.getListGames(listGames, function(err, game) {
+        Game.getGamesById(listGames, function(err, games) {
             if (err) res.send(err);
-            res.json(game);
+            res.json(games);
         });
     }
 };

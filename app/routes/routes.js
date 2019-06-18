@@ -5,8 +5,7 @@ module.exports = function(app) {
 
 /*<---------GAMES---------->*/
     app.route('/games')
-        .get(games.getListGames)
-        .post(games.addGame);
+        .post(games.getGamesById);
     
     app.route('/games/:gameId')
         .get(games.getGame)

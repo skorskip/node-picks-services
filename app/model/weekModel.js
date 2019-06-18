@@ -14,63 +14,58 @@ Week.getWeek = function getWeek(season, week, result){
     var getWeekSQL = new Promise((resolve, reject) => {
         Week.getWeekSQL(season, week, function(err, data){
             if(err) reject(result(err, null));
-            else resolve(data);
+            
+            resolve(data);
         });
     });
 
     getWeekSQL.then(function(data, err) {
         if(err) result(err, null);
-        var week = {};
-        week.games = data;
-        week.number = data[0].week;
-        week.season = data[0].season;
-        week.teams = [];
+        
+        var teams = [];
         data.forEach(game => {
-            week.teams.push(game.awayTeam);
-            week.teams.push(game.homeTeam);
+            teams.push(game.awayTeam);
+            teams.push(game.homeTeam);
         });
-        result(null, week);
+        result(null, Week.weekMapper(data, data[0].season, data[0].week, teams));
     });
 }
 
 Week.getCurrentWeek = function getCurrentWeek(req, result) {
     var currWeek;
     var currSeason;
-    var currDate = new Date();
+    //var currDate = new Date();
     sql.query("SELECT * FROM games WHERE date in (SELECT MAX(date) FROM games)", req, function(err, res){
         if(err) result(err, null);
-        else {
-            currSeason = res[0].season;
-            if(res[0].week < 17 && currDate > res[0].date) {
-                currWeek = res[0].week + 1;
-            } else {
-                currWeek = res[0].week;
-            }
-            Week.getWeek(currSeason, currWeek, function(err, games){
-                if(err) result(err,null);
-                else result(null,games);
-            });
-        }
+        
+        currSeason = res[0].season;
+        currWeek = res[0].week;
+        // if(res[0].week < 17 && currDate > res[0].date) {
+        //     currWeek++;
+        // }
+        Week.getWeek(currSeason, currWeek, function(err, games){
+            if(err) result(err,null);
+            else result(null,games);
+        });
+    
     });
 }
 
 Week.getWeekSQL = function getWeekSQL(season, week, result) {
     sql.query("SELECT * FROM games where season = ? AND week = ?", [season, week], function(err, data){
         if(err) result(err, null);
-        else {
-            if(data.length == 0){
-                Week.populateWeekData(season, week, function(err, res) {
+
+        if(data.length == 0){
+            Week.populateWeekData(season, week, function(err, res) {
+                if(err) result(err, null);
+                
+                Week.getWeekSQL(season, week, function(err, dataPopulated) {
                     if(err) result(err, null);
-                    else {
-                        Week.getWeekSQL(season, week, function(err, dataPopulated) {
-                            if(err) result(err, null);
-                            else result(null, dataPopulated);
-                        });
-                    }
+                    else result(null, dataPopulated);
                 });
-            } else {
-                result(null, data);
-            }
+            });
+        } else {
+            result(null, data);
         }
     });
 };
@@ -91,6 +86,15 @@ Week.populateWeekData = function populateWeekData(season, week, result){
             });
         }
     });
+};
+
+Week.weekMapper = function(games, season, week, teams) {
+    var weekObject = {};
+    weekObject.games = games;
+    weekObject.number = week;
+    weekObject.season = season;
+    weekObject.teams = teams;
+    return weekObject;
 };
 
 module.exports= Week;

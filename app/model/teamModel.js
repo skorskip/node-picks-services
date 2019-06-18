@@ -30,6 +30,7 @@ Team.getTeamByAbbrev = function getTeamByAbbrev(teamAbbrev, result) {
 };
 
 Team.getTeamsById = function getTeamsById(teamIds, result) {
+    console.log(teamIds);
     sql.query("SELECT * FROM teams WHERE id in (?)", [teamIds], function(err, res){
         if(err) result(err, null);
         else result(null, res);

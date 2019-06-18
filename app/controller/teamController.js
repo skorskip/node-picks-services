@@ -24,6 +24,7 @@ exports.getTeamByAbbrev = function(req, res){
 };
 
 exports.getTeamsById = function(req, res) {
+    console.log(req.body);
     Team.getTeamsById(req.body, function(err, teams) {
         if(err) res.send(err);
         res.json(teams);

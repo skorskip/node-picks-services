@@ -28,12 +28,8 @@ Game.getGameById = function getGameById(gameId, result) {
         else result(null, res);
     });   
 };
-Game.getListGames = function getListGames(listGames, result) {
-    var list = '('
-    listGames.array.forEach(gameId => {
-        list = list + "'" + gameId + "'" + ','; 
-    });
-    sql.query("Select * from games where id IN = ?", list, function (err, res) {
+Game.getGamesById = function getGamesById(listGameIds, result) {
+    sql.query("Select * from games where id in (?)", [listGameIds], function (err, res) {
         if(err) result(err, null);
         else result(null, res);
     });   
