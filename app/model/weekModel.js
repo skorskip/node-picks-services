@@ -2,6 +2,7 @@
 var sql = require('./db.js');
 var Game = require('../model/gameModel.js');
 var Data = require('../model/dataModel.js');
+var config = require('../../config.json')
 
 var Week = function(week){
     this.number = week.number;
@@ -13,8 +14,7 @@ var Week = function(week){
 Week.getWeek = function getWeek(season, week, result){
     var getWeekSQL = new Promise((resolve, reject) => {
         Week.getWeekSQL(season, week, function(err, data){
-            if(err) reject(result(err, null));
-            
+            if(err) reject(result(err, null));  
             resolve(data);
         });
     });
@@ -32,33 +32,27 @@ Week.getWeek = function getWeek(season, week, result){
 }
 
 Week.getCurrentWeek = function getCurrentWeek(req, result) {
-    var currWeek;
-    var currSeason;
-    //var currDate = new Date();
-    sql.query("SELECT * FROM games WHERE date in (SELECT MAX(date) FROM games)", req, function(err, res){
-        if(err) result(err, null);
-        
-        currSeason = res[0].season;
-        currWeek = res[0].week;
-        // if(res[0].week < 17 && currDate > res[0].date) {
-        //     currWeek++;
-        // }
-        Week.getWeek(currSeason, currWeek, function(err, games){
-            if(err) result(err,null);
-            else result(null,games);
-        });
-    
+    var currDate = new Date();
+    var seasonStart = new Date(config.data.nflSeason, config.data.nflStartMonth, config.data.nflStartDay);
+
+    var deltaDate = Math.abs(currDate - seasonStart);
+    var currWeek = Math.ceil(((deltaDate / (1000*60*60*24)) / 7));
+
+    Week.getWeek(config.data.nflSeason, currWeek, function(err, games){
+        if(err) result(err,null);
+        else result(null,games);
     });
 }
 
 Week.getWeekSQL = function getWeekSQL(season, week, result) {
     sql.query("SELECT * FROM games where season = ? AND week = ?", [season, week], function(err, data){
-        if(err) result(err, null);
-
-        if(data.length == 0){
+        if(err) { 
+            result(err, null);
+        } else if(data.length == 0){
             Week.populateWeekData(season, week, function(err, res) {
                 if(err) result(err, null);
-                
+                console.log("INSERTED GAMES::", res);
+
                 Week.getWeekSQL(season, week, function(err, dataPopulated) {
                     if(err) result(err, null);
                     else result(null, dataPopulated);
@@ -68,10 +62,6 @@ Week.getWeekSQL = function getWeekSQL(season, week, result) {
             result(null, data);
         }
     });
-};
-
-Week.updateWeek = function updateWeek(){
-
 };
 
 Week.populateWeekData = function populateWeekData(season, week, result){

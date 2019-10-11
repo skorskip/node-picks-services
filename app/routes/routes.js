@@ -2,6 +2,8 @@ module.exports = function(app) {
     var games = require('../controller/gameController');
     var week = require('../controller/weekController');
     var teams = require('../controller/teamController');
+    var picks = require('../controller/pickController');
+    var users = require('../controller/userController');
 
 /*<---------GAMES---------->*/
     app.route('/games')
@@ -29,4 +31,31 @@ module.exports = function(app) {
 
     app.route('/teams/abbrv/:teamAbbrev')
         .get(teams.getTeamByAbbrev);
+
+/*<---------PICKS----------->*/
+    app.route('/picks/user/:userId')
+        .get(picks.getPicksByUser);
+
+    app.route('/picks/user/:userId/season/:season/week/:week')
+        .get(picks.getPicksByWeek);
+
+    app.route('/picks/create')
+        .post(picks.addPicks);
+
+    app.route('/picks/:id')
+        .get(picks.getPick)
+        .put(picks.updatePick)
+        .delete(picks.deletePick);
+
+/*<---------USERS------------>*/
+    app.route('/users/:id')
+        .get(users.getUser)
+        .put(users.updateUser)
+        .delete(users.deleteUser);
+
+    app.route('/users/register')
+        .post(users.createUser);
+
+    app.route('/users/login')
+        .post(users.login);
 };

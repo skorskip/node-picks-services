@@ -9,7 +9,7 @@ var Team = function(team){
 };
 
 Team.getTeam = function getTeam(teamId, result) {
-    sql.query("SELECT * FROM teams where id = ? ", teamId, function(err, res){
+    sql.query("SELECT * FROM teams where teamId = ? ", teamId, function(err, res){
         if(err) result(err, null);
         else result(null, res);
     });
@@ -31,7 +31,7 @@ Team.getTeamByAbbrev = function getTeamByAbbrev(teamAbbrev, result) {
 
 Team.getTeamsById = function getTeamsById(teamIds, result) {
     console.log(teamIds);
-    sql.query("SELECT * FROM teams WHERE id in (?)", [teamIds], function(err, res){
+    sql.query("SELECT * FROM teams WHERE teamId in (?)", [teamIds], function(err, res){
         if(err) result(err, null);
         else result(null, res);
     });
