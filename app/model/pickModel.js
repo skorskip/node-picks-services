@@ -3,9 +3,7 @@ var sql = require('./db.js');
 
 var Pick = function(pick) {
     this.game_id        = pick.game_id;
-    this.api_game_id    = pick.api_game_id;
     this.team_id        = pick.team_id;
-    this.api_team_id    = pick.api_team_id;
     this.user_id        = pick.user_id;
 }
 
@@ -18,7 +16,7 @@ Pick.getPicksByUser = function getPicksByUser(userId, result) {
 
 Pick.getPicksByWeek = function getPicksByWeek(userId, season, week, result) {
     sql.query(
-        "SELECT p.game_id, p.api_game_id, p.team_id, p.api_team_id, p.user_id" +
+        "SELECT p.game_id, p.api_team_id, p.user_id" +
         "FROM picks p, games g" + 
         "WHERE p.game_id = g.game_id" + 
         "g.season = ? AND g.week = ? AND p.user_id = ?", [season, week, userId], function(err, res){

@@ -38,7 +38,7 @@ User.createUser = function createUser(user, result) {
 };
 
 User.login = function login(userPass, result) {
-    sql.query('SELECT * FROM users WHERE (user_name = ? OR email = ?) AND password = ?', [userPass.name, userPass.name, userPass.password], function(err, res) {
+    sql.query('SELECT * FROM users WHERE (user_name = ? OR email = ?) AND password = ?', [userPass.user_name, userPass.user_name, userPass.password], function(err, res) {
         if(err) result(err, null);
         else result(null,res);
     })
