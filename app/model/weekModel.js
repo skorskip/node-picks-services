@@ -23,8 +23,8 @@ Week.getWeek = function getWeek(season, week, result){
         
         var teams = [];
         data.forEach(game => {
-            teams.push(game.awayTeam);
-            teams.push(game.homeTeam);
+            teams.push(game.away_team);
+            teams.push(game.home_team);
         });
         result(null, Week.weekMapper(data, data[0].season, data[0].week, teams));
     });
