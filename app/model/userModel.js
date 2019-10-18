@@ -19,7 +19,13 @@ User.getUser = function getUser(userId, result){
 User.updateUser = function updateUser(userId, user, result) {
     sql.query('UPDATE users SET ? WHERE user_id = ?', [user, userId], function(err, res){
         if(err) result(err, null);
-        else result(null, res);
+        else {
+            if(res.affectedRows == 1) {
+                result(null, 'SUCCESS');
+            } else {
+                result(null, 'FAILURE')
+            }
+        }
     });
 };
 
