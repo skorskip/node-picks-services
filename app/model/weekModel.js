@@ -1,7 +1,6 @@
 'user strict';
 var sql = require('./db.js');
 var Game = require('../model/gameModel.js');
-var Data = require('../model/dataModel.js');
 var config = require('../../config.json')
 
 var Week = function(week){
@@ -24,8 +23,8 @@ Week.getWeek = function getWeek(season, week, result){
         
         var teams = [];
         data.forEach(game => {
-            teams.push(game.awayTeam);
-            teams.push(game.homeTeam);
+            teams.push(game.away_team);
+            teams.push(game.home_team);
         });
         result(null, Week.weekMapper(data, data[0].season, data[0].week, teams));
     });
@@ -45,35 +44,11 @@ Week.getCurrentWeek = function getCurrentWeek(req, result) {
 }
 
 Week.getWeekSQL = function getWeekSQL(season, week, result) {
-    sql.query("SELECT * FROM games where season = ? AND week = ?", [season, week], function(err, data){
+    sql.query("SELECT * FROM games where season = ? AND week = ? AND home_spread is not NULL", [season, week], function(err, data){
         if(err) { 
             result(err, null);
-        } else if(data.length == 0){
-            Week.populateWeekData(season, week, function(err, res) {
-                if(err) result(err, null);
-                console.log("INSERTED GAMES::", res);
-
-                Week.getWeekSQL(season, week, function(err, dataPopulated) {
-                    if(err) result(err, null);
-                    else result(null, dataPopulated);
-                });
-            });
         } else {
             result(null, data);
-        }
-    });
-};
-
-Week.populateWeekData = function populateWeekData(season, week, result){
-    Data.getWeekData(season, week, function(err, data){
-        if(err) result(err, null);
-        else { 
-            Game.insertAPIData(data, week, season, function(err, res){
-                if(err) result(err, null);
-                else {
-                    result(null, res);
-                }
-            });
         }
     });
 };

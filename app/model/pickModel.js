@@ -2,22 +2,25 @@
 var sql = require('./db.js');
 
 var Pick = function(pick) {
-    this.season = pick.season;
-    this.week   = pick.week;
-    this.gameId = pick.gameId;
-    this.teamId = pick.teamId;
-    this.userId = pick.userId;
+    this.game_id        = pick.game_id;
+    this.team_id        = pick.team_id;
+    this.user_id        = pick.user_id;
 }
 
 Pick.getPicksByUser = function getPicksByUser(userId, result) {
-    sql.query("SELECT * FROM picks WHERE userId = ?", userId, function(err, res) {
+    sql.query("SELECT * FROM picks WHERE user_id = ?", userId, function(err, res) {
         if(err) result(err, null);
         else result(null, res);
     });
 };
 
 Pick.getPicksByWeek = function getPicksByWeek(userId, season, week, result) {
-    sql.query("SELECT * FROM picks WHERE season = ? AND week = ? AND userId = ?", [season, week, userId], function(err, res){
+    sql.query(
+        "SELECT p.pick_id, p.game_id, p.team_id, p.user_id " +
+        "FROM picks p, games g " + 
+        "WHERE p.game_id = g.game_id " + 
+        "AND g.season = ? AND g.week = ? AND p.user_id = ?", [season, week, userId], function(err, res){
+        
         if(err) result(err, null);
         else result(null, res);
     });
@@ -42,14 +45,14 @@ Pick.addPicks = function addPicks(picks, result) {
 }
 
 Pick.getPick = function getPick(id, result) {
-    sql.query("SELECT * FROM picks WHERE pickId = ?", id, function(err, res) {
+    sql.query("SELECT * FROM picks WHERE pick_id = ?", id, function(err, res) {
         if(err) result(err, null);
         else result(null, res);
     });
 }
 
 Pick.deletePick = function deletePick(id, result) {
-    sql.query("DELETE FROM picks WHERE pickId = ?", id, function(err, res) {
+    sql.query("DELETE FROM picks WHERE pick_id = ?", id, function(err, res) {
         if(err) result(err, null);
         else result(null, "SUCCESS");
     });
@@ -64,7 +67,7 @@ Pick.updatePick = function updatePick(id, pick, result) {
             result(errorCheckDate, null);
         } else {
             if(valid) {
-                sql.query("UPDATE picks SET teamId = ? WHERE pickId = ?", [pick.teamId, id], function(err, res) {
+                sql.query("UPDATE picks SET team_id = ? WHERE pick_id = ?", [pick.team_id, id], function(err, res) {
                     if(err) result(err, null);
                     else result(null, "SUCCESS");
                 });
@@ -81,7 +84,7 @@ Pick.checkPicksDateValid = function checkPicksDateValid(picks, result) {
         gameArray.push(picks[i].gameId);
     }
 
-    sql.query("SELECT COUNT(*) as count FROM games WHERE gameId in (?) AND submitDate < ?", [gameArray, new Date()], function(err, res) {
+    sql.query("SELECT COUNT(*) as count FROM games WHERE game_id in (?) AND start_time < ?", [gameArray, new Date()], function(err, res) {
         if(err) result(err, null);
         else result(null,res[0].count == 0);
     })

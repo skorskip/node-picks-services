@@ -2,14 +2,15 @@
 var sql = require('./db.js');
 
 var Team = function(team){
-    this.primaryColor   = team.primaryColor;
-    this.secondaryColor = team.secondaryColor;
-    this.abbreviation   = team.abbreviation;
-    this.name           = team.name;
+    this.team_city          = team.team_city;
+    this.team_name          = team.team_name;
+    this.abbreviation       = team.abbreviation;
+    this.primary_color      = team.primary_color;
+    this.secondary_color    = team.secondary_color;
 };
 
 Team.getTeam = function getTeam(teamId, result) {
-    sql.query("SELECT * FROM teams where teamId = ? ", teamId, function(err, res){
+    sql.query("SELECT * FROM teams where team_id = ? ", teamId, function(err, res){
         if(err) result(err, null);
         else result(null, res);
     });
@@ -31,7 +32,7 @@ Team.getTeamByAbbrev = function getTeamByAbbrev(teamAbbrev, result) {
 
 Team.getTeamsById = function getTeamsById(teamIds, result) {
     console.log(teamIds);
-    sql.query("SELECT * FROM teams WHERE teamId in (?)", [teamIds], function(err, res){
+    sql.query("SELECT * FROM teams WHERE team_id in (?)", [teamIds], function(err, res){
         if(err) result(err, null);
         else result(null, res);
     });
