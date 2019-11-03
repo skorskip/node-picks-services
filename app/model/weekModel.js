@@ -44,7 +44,7 @@ Week.getCurrentWeek = function getCurrentWeek(req, result) {
 }
 
 Week.getWeekSQL = function getWeekSQL(season, week, result) {
-    sql.query("SELECT * FROM games where season = ? AND week = ?", [season, week], function(err, data){
+    sql.query("SELECT * FROM games where season = ? AND week = ? AND home_spread is not NULL", [season, week], function(err, data){
         if(err) { 
             result(err, null);
         } else {

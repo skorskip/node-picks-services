@@ -67,7 +67,7 @@ Pick.updatePick = function updatePick(id, pick, result) {
             result(errorCheckDate, null);
         } else {
             if(valid) {
-                sql.query("UPDATE picks SET teamId = ? WHERE pickId = ?", [pick.teamId, id], function(err, res) {
+                sql.query("UPDATE picks SET team_id = ? WHERE pick_id = ?", [pick.team_id, id], function(err, res) {
                     if(err) result(err, null);
                     else result(null, "SUCCESS");
                 });
