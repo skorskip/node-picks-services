@@ -22,11 +22,13 @@ Week.getWeek = function getWeek(season, week, result){
         if(err) result(err, null);
         
         var teams = [];
-        data.forEach(game => {
-            teams.push(game.away_team);
-            teams.push(game.home_team);
-        });
-        result(null, Week.weekMapper(data, data[0].season, data[0].week, teams));
+        if(data.length > 0) {
+            data.forEach(game => {
+                teams.push(game.away_team);
+                teams.push(game.home_team);
+            });
+        }
+        result(null, Week.weekMapper(data, season, week, teams));
     });
 }
 
@@ -35,7 +37,7 @@ Week.getCurrentWeek = function getCurrentWeek(req, result) {
     var seasonStart = new Date(config.data.nflSeason, config.data.nflStartMonth, config.data.nflStartDay);
 
     var deltaDate = Math.abs(currDate - seasonStart);
-    var currWeek = Math.ceil(((deltaDate / (1000*60*60*24)) / 7));
+    var currWeek = Math.floor(((deltaDate / (1000*60*60*24)) / 7));
 
     Week.getWeek(config.data.nflSeason, currWeek, function(err, games){
         if(err) result(err,null);
