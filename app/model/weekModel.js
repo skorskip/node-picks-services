@@ -34,7 +34,7 @@ Week.getWeek = function getWeek(season, week, result){
 
 Week.getCurrentWeek = function getCurrentWeek(req, result) {
     var currDate = new Date();
-    var seasonStart = new Date(config.data.nflSeason, config.data.nflStartMonth, config.data.nflStartDay);
+    var seasonStart = new Date(config.data.nflSeason, config.data.nflStartMonth, config.data.nflStartDay, config.data.nflStartTime, 0, 0);
     var deltaDate = Math.abs(currDate - seasonStart);    
     var currWeek = Math.floor(((deltaDate / (1000*60*60*24)) / 7)) + 1;
 
