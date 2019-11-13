@@ -35,5 +35,12 @@ exports.login = function(req, res) {
         if(err) res.send(err);
         res.json(user);
     })
-}
+};
+
+exports.standings = function(req, res) {
+    User.standings(req.params.season, function(err, users) {
+        if(err) res.send(err);
+        res.json(users);
+    })
+};
 
