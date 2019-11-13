@@ -26,7 +26,7 @@ Game.addGame = function addGame(newGame, result) {
 };
 
 Game.getGameById = function getGameById(gameId, result) {
-    sql.query("Select * from games where game_id = ? ", gameId, function (err, res) {             
+    sql.query("Select * from games where game_id = ? ORDER BY pick_submit_by_date ASC", gameId, function (err, res) {             
         if(err)result(err, null);
         else result(null, res);
     });   

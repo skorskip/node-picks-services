@@ -44,10 +44,21 @@ User.createUser = function createUser(user, result) {
 };
 
 User.login = function login(userPass, result) {
-    sql.query('SELECT * FROM users WHERE (user_name = ? OR email = ?) AND password = ?', [userPass.user_name, userPass.user_name, userPass.password], function(err, res) {
+    sql.query('SELECT * FROM users WHERE (LOWER(user_name) = ? OR email = ?) AND password = ?', [userPass.user_name.toLowerCase(), userPass.user_name, userPass.password], function(err, res) {
         if(err) result(err, null);
         else result(null,res);
     })
-}
+};
+
+User.standings = function standings(season, result) {
+    sql.query('SELECT r.user_id, u.user_inits, user_name, sum(wins) as wins, sum(picks) as picks, round(sum(wins)/sum(picks),3) as win_pct ' +
+        'FROM rpt_weekly_user_stats r, users u ' +
+        'WHERE r.user_id = u.user_id AND season = ?' +
+        'GROUP BY season, u.user_id ' +
+        'ORDER BY season, wins DESC, win_pct DESC', season, function(err, res) {
+            if(err) result(err, null);
+            else result(null, res)
+        });
+};
 
 module.exports = User;

@@ -49,7 +49,6 @@ module.exports = function(app) {
 
 /*<---------USERS------------>*/
     app.route('/users/:id')
-        .get(users.getUser)
         .put(users.updateUser)
         .delete(users.deleteUser);
 
@@ -58,4 +57,7 @@ module.exports = function(app) {
 
     app.route('/users/login')
         .post(users.login);
+
+    app.route('/users/standings/:season')
+        .get(users.standings);
 };
