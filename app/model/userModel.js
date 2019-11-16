@@ -5,20 +5,26 @@ var User = function(user) {
     this.user_name = user.user_name;
     this.first_name = user.first_name;
     this.last_name = user.last_name;
+    this.user_init = user.user_init;
     this.password = user.password;
     this.email = user.email;
 }
 
-User.getUser = function getUser(userId, result){
-    sql.query('SELECT * FROM users WHERE user_id = ?', userId, function(err, res) {
-        if(err) result(err, null);
-        else result(null, res);
-    });
-};
-
 User.updateUser = function updateUser(userId, user, result) {
-    sql.query('UPDATE users SET ? WHERE user_id = ?', [user, userId], function(err, res){
-        if(err) result(err, null);
+    sql.query('UPDATE users SET ' +
+    'user_name = ?, ' + 
+    'first_name = ?, ' +
+    'last_name = ?, ' +
+    'email = ?, ' +
+    'password = sha2(concat(password_salt,?),256) ' +
+    'WHERE user_id = ?', [
+        user.user_name,
+        user.first_name,
+        user.last_name,
+        user.email,
+        user.password, 
+        userId], function(err, res){
+        if(err) result(null, 'FAILURE');
         else {
             if(res.affectedRows == 1) {
                 result(null, 'SUCCESS');
@@ -44,7 +50,10 @@ User.createUser = function createUser(user, result) {
 };
 
 User.login = function login(userPass, result) {
-    sql.query('SELECT * FROM users WHERE (LOWER(user_name) = ? OR email = ?) AND password = ?', [userPass.user_name.toLowerCase(), userPass.user_name, userPass.password], function(err, res) {
+    sql.query('SELECT user_id, user_name, first_name, last_name, user_inits, email ' +
+        'FROM users ' +
+        'WHERE (LOWER(user_name) = ? OR email = ?) ' +
+        'AND sha2(concat(password_salt,?),256) = password', [userPass.user_name.toLowerCase(), userPass.user_name, userPass.password], function(err, res) {
         if(err) result(err, null);
         else result(null,res);
     })
