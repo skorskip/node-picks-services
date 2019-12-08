@@ -26,6 +26,18 @@ Pick.getPicksByWeek = function getPicksByWeek(userId, season, week, result) {
     });
 }
 
+Pick.getPicksByGame = function getPicksByGame(gameId, result) {
+    sql.query(
+        "SELECT p.pick_id, p.game_id, p.team_id, p.user_id, u.user_inits " +
+        "FROM picks p, users u " + 
+        "WHERE p.user_id = u.user_id " + 
+        "AND p.game_id = ?", [gameId], function(err, res){
+
+        if(err) result(err, null);
+        else result(null, res);
+    });
+}
+
 Pick.addPicks = function addPicks(picks, result) {
     this.checkPicksDateValid(picks, function(errorCheckDate, valid) {
         if(errorCheckDate) {

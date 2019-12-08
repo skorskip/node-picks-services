@@ -47,6 +47,9 @@ module.exports = function(app) {
         .put(picks.updatePick)
         .delete(picks.deletePick);
 
+    app.route('/picks/game/:gameId')
+        .get(picks.getPicksByGame);
+
 /*<---------USERS------------>*/
     app.route('/users/:id')
         .put(users.updateUser)
