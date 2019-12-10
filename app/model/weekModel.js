@@ -1,6 +1,5 @@
 'user strict';
 var sql = require('./db.js');
-var Game = require('../model/gameModel.js');
 var config = require('../../config.json')
 
 var Week = function(week){
@@ -38,14 +37,15 @@ Week.getCurrentWeek = function getCurrentWeek(req, result) {
     var deltaDate = Math.abs(currDate - seasonStart);    
     var currWeek = Math.floor(((deltaDate / (1000*60*60*24)) / 7)) + 1;
 
-    Week.getWeek(config.data.nflSeason, currWeek, function(err, games){
-        if(err) result(err,null);
-        else result(null,games);
-    });
+    var currWeekObj = {};
+    currWeekObj.season = config.data.nflSeason;
+    currWeekObj.week = currWeek;
+
+    result(null, currWeekObj);
 }
 
 Week.getWeekSQL = function getWeekSQL(season, week, result) {
-    sql.query("SELECT * FROM games where season = ? AND week = ? AND home_spread is not NULL", [season, week], function(err, data){
+    sql.query("SELECT * FROM games where season = ? AND week = ? AND home_spread is not NULL ORDER BY start_time", [season, week], function(err, data){
         if(err) { 
             result(err, null);
         } else {

@@ -60,11 +60,13 @@ User.login = function login(userPass, result) {
 };
 
 User.standings = function standings(season, result) {
-    sql.query('SELECT r.user_id, u.user_inits, user_name, sum(wins) as wins, sum(picks) as picks, round(sum(wins)/sum(picks),3) as win_pct ' +
+    sql.query(
+        'SELECT rank() over(order by wins desc) as ranking, results.* FROM ' + 
+        '(SELECT r.user_id, u.user_inits, user_name, sum(wins) as wins, sum(picks) as picks, round(sum(wins)/sum(picks),3) as win_pct ' +
         'FROM rpt_weekly_user_stats r, users u ' +
         'WHERE r.user_id = u.user_id AND season = ?' +
         'GROUP BY season, u.user_id ' +
-        'ORDER BY season, wins DESC, win_pct DESC', season, function(err, res) {
+        'ORDER BY season, wins DESC, win_pct DESC, user_inits) as results', season, function(err, res) {
             if(err) result(err, null);
             else result(null, res)
         });
