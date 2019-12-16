@@ -33,11 +33,11 @@ module.exports = function(app) {
         .get(teams.getTeamByAbbrev);
 
 /*<---------PICKS----------->*/
-    app.route('/picks/user/:userId')
-        .get(picks.getPicksByUser);
-
     app.route('/picks/user/:userId/season/:season/week/:week')
-        .get(picks.getPicksByWeek);
+        .get(picks.getUsersPicksByWeek);
+
+    app.route('/picks/season/:season/week/:week')
+        .post(picks.getPicksByWeek);
 
     app.route('/picks/create')
         .post(picks.addPicks);
