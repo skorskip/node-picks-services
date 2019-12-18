@@ -45,7 +45,7 @@ Pick.getPicksByGame = function getPicksByGame(gameId, result) {
         "WHERE p.user_id = u.user_id " + 
         "AND p.game_id = ? " + 
         "AND g.game_id = p.game_id " +
-        "AND g.pick_submit_by_date < ?", [gameId, new Date()], function(err, res){
+        "AND g.pick_submit_by_date < ? order by u.first_name, u.last_name", [gameId, new Date()], function(err, res){
 
         if(err) result(err, null);
         else result(null, res);
