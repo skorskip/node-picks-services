@@ -2,15 +2,22 @@
 
 var Pick = require('../model/pickModel.js');
 
-exports.getPicksByUser = function(req, res) {
-    Pick.getPicksByUser(req.params.userId, function(err, picks) {
+exports.getUsersPicksByWeek = function(req, res) {
+    Pick.getUsersPicksByWeek(req.params.userId, req.params.season, req.params.week, function(err, picks) {
         if(err) res.send(err);
         res.json(picks);
     });
 };
 
 exports.getPicksByWeek = function(req, res) {
-    Pick.getPicksByWeek(req.params.userId, req.params.season, req.params.week, function(err, picks) {
+    Pick.getPicksByWeek(req.body, req.params.season, req.params.week, function(err, picks) {
+        if(err) res.send(err);
+        res.json(picks);
+    });
+};
+
+exports.getPicksByGame = function(req, res) {
+    Pick.getPicksByGame(req.params.gameId, function(err, picks) {
         if(err) res.send(err);
         res.json(picks);
     });

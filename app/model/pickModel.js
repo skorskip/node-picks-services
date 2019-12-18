@@ -7,20 +7,46 @@ var Pick = function(pick) {
     this.user_id        = pick.user_id;
 }
 
-Pick.getPicksByUser = function getPicksByUser(userId, result) {
-    sql.query("SELECT * FROM picks WHERE user_id = ?", userId, function(err, res) {
-        if(err) result(err, null);
-        else result(null, res);
-    });
-};
-
-Pick.getPicksByWeek = function getPicksByWeek(userId, season, week, result) {
+Pick.getUsersPicksByWeek = function getUsersPicksByWeek(userId, season, week, result) {
     sql.query(
         "SELECT p.pick_id, p.game_id, p.team_id, p.user_id " +
         "FROM picks p, games g " + 
         "WHERE p.game_id = g.game_id " + 
-        "AND g.season = ? AND g.week = ? AND p.user_id = ?", [season, week, userId], function(err, res){
+        "AND g.season = ? " +
+        "AND g.week = ? " + 
+        "AND p.user_id = ? " +
+        "AND g.pick_submit_by_date < ?", [season, week, userId, new Date()], function(err, res){
         
+        if(err) result(err, null);
+        else result(null, res);
+    });
+}
+
+Pick.getPicksByWeek = function getPicksByWeek(user, season, week, result) {
+    sql.query(        
+        "SELECT p.pick_id, p.game_id, p.team_id, p.user_id " +
+        "FROM picks p, games g, users u " + 
+        "WHERE p.game_id = g.game_id " + 
+        "AND g.season = ? " + 
+        "AND g.week = ? " +
+        "AND u.user_id = p.user_id " +
+        "AND u.user_id = ? " +
+        "AND u.password = ?", [season, week, user.user_id, user.password], function(err, res) {
+
+        if(err) result(err, null);
+        else result(null, res);
+    });
+}
+
+Pick.getPicksByGame = function getPicksByGame(gameId, result) {
+    sql.query(
+        "SELECT p.pick_id, p.game_id, p.team_id, p.user_id, u.user_inits, u.first_name, u.last_name " +
+        "FROM picks p, users u, games g " + 
+        "WHERE p.user_id = u.user_id " + 
+        "AND p.game_id = ? " + 
+        "AND g.game_id = p.game_id " +
+        "AND g.pick_submit_by_date < ? order by u.first_name, u.last_name", [gameId, new Date()], function(err, res){
+
         if(err) result(err, null);
         else result(null, res);
     });
