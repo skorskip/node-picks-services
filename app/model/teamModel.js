@@ -31,11 +31,14 @@ Team.getTeamByAbbrev = function getTeamByAbbrev(teamAbbrev, result) {
 };
 
 Team.getTeamsById = function getTeamsById(teamIds, result) {
-    console.log(teamIds);
-    sql.query("SELECT * FROM teams WHERE team_id in (?)", [teamIds], function(err, res){
-        if(err) result(err, null);
-        else result(null, res);
-    });
+    if(teamIds.length > 0) {
+        sql.query("SELECT * FROM teams WHERE team_id in (?)", [teamIds], function(err, res){
+            if(err) result(err, null);
+            else result(null, res);
+        });
+    } else {
+        result(null, []);
+    }
 }
 
 module.exports= Team;

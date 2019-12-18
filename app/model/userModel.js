@@ -50,7 +50,7 @@ User.createUser = function createUser(user, result) {
 };
 
 User.login = function login(userPass, result) {
-    sql.query('SELECT user_id, user_name, first_name, last_name, user_inits, email ' +
+    sql.query('SELECT user_id, user_name, first_name, last_name, user_inits, email, password ' +
         'FROM users ' +
         'WHERE (LOWER(user_name) = ? OR email = ?) ' +
         'AND sha2(concat(password_salt,?),256) = password', [userPass.user_name.toLowerCase(), userPass.user_name, userPass.password], function(err, res) {
@@ -62,7 +62,7 @@ User.login = function login(userPass, result) {
 User.standings = function standings(season, result) {
     sql.query(
         'SELECT rank() over(order by wins desc) as ranking, results.* FROM ' + 
-        '(SELECT r.user_id, u.user_inits, user_name, sum(wins) as wins, sum(picks) as picks, round(sum(wins)/sum(picks),3) as win_pct ' +
+        '(SELECT r.user_id, u.user_inits, user_name, first_name, last_name, sum(wins) as wins, sum(picks) as picks, round(sum(wins)/sum(picks),3) as win_pct ' +
         'FROM rpt_weekly_user_stats r, users u ' +
         'WHERE r.user_id = u.user_id AND season = ?' +
         'GROUP BY season, u.user_id ' +
