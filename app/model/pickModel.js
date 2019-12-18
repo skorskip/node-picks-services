@@ -40,7 +40,7 @@ Pick.getPicksByWeek = function getPicksByWeek(user, season, week, result) {
 
 Pick.getPicksByGame = function getPicksByGame(gameId, result) {
     sql.query(
-        "SELECT p.pick_id, p.game_id, p.team_id, p.user_id, u.user_inits " +
+        "SELECT p.pick_id, p.game_id, p.team_id, p.user_id, u.user_inits, u.first_name, u.last_name " +
         "FROM picks p, users u, games g " + 
         "WHERE p.user_id = u.user_id " + 
         "AND p.game_id = ? " + 
