@@ -35,7 +35,7 @@ Game.getGameById = function getGameById(gameId, result) {
 };
 
 Game.getGamesById = function getGamesById(listGameIds, result) {
-    sql.query("Select * from games where game_id in (?)", [listGameIds], function (err, res) {
+    sql.query("Select * from games where game_id in (?) ORDER BY start_time", [listGameIds], function (err, res) {
         if(err) result(err, null);
         else result(null, res);
     });   
