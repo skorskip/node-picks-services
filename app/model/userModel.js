@@ -72,4 +72,16 @@ User.standings = function standings(season, result) {
         });
 };
 
+User.standingsByUser = function standingsByUser(season, user, result) {
+    sql.query(
+        'SELECT r.user_id, u.user_inits, user_name, first_name, last_name, sum(wins) as wins, sum(picks) as picks, round(sum(wins)/sum(picks),3) as win_pct ' +
+        'FROM rpt_weekly_user_stats r, users u ' +
+        'WHERE r.user_id = u.user_id AND season = ? ' +
+        'AND r.user_id = ? ' +
+        'GROUP BY season, u.user_id ', [season, user.user_id], function(err, res) {
+            if(err) result(err, null);
+            else result(null, res)
+        });
+};  
+
 module.exports = User;
