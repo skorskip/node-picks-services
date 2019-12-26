@@ -37,3 +37,10 @@ exports.standings = function(req, res) {
     })
 };
 
+exports.standingsByUser = function(req, res) {
+    User.standingsByUser(req.params.season, req.body, function(err, users){
+        if(err) res.send(err);
+        res.json(users);
+    })
+};
+
