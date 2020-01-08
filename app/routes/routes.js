@@ -5,6 +5,7 @@ module.exports = function(app) {
     var picks = require('../controller/pickController');
     var users = require('../controller/userController');
     var league = require('../controller/leagueController');
+    var message = require('../controller/messageController');
 
 /*<---------GAMES---------->*/
     app.route('/games')
@@ -69,5 +70,10 @@ module.exports = function(app) {
 /*<---------LEAGUE------------>*/
     app.route('/league/settings')
         .get(league.leagueSettings);
+
+/*<---------MESSAGING--------->*/
+
+    app.route('/message/announcements')
+        .post(message.announcements);
 
 };
