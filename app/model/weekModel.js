@@ -1,6 +1,5 @@
 'user strict';
 var sql = require('./db.js');
-var config = require('../../config.json');
 var League = require('./leagueModel');
 
 var Week = function(week){
@@ -36,9 +35,8 @@ Week.getCurrentWeek = function getCurrentWeek(req, result) {
     League.leagueSettings(function(err,settings){
         if(err) result(err, null);
 
-        console.log(settings);
         var currDate = new Date();
-        var seasonStart = new Date(config.data.nflSeason, config.data.nflStartMonth, config.data.nflStartDay, config.data.nflStartTime, 0, 0);
+        var seasonStart = new Date(settings.seasonStart);
         var deltaDate = Math.abs(currDate - seasonStart);    
         var currWeek = Math.floor(((deltaDate / (1000*60*60*24)) / 7)) + 1;
 
@@ -48,7 +46,7 @@ Week.getCurrentWeek = function getCurrentWeek(req, result) {
         }
         
         var currWeekObj = {};
-        currWeekObj.season = config.data.nflSeason;
+        currWeekObj.season = settings.currentSeason;
         currWeekObj.week = currWeek;
     
         result(null, currWeekObj);
