@@ -13,12 +13,14 @@ Message.announcements = function announcements(body, result){
 
         (async () => {
 
-            var startOfWeek = new Date(body.lastCheckDate);
+            var lastChecked = new Date(body.lastCheckDate);
+            var currDate = new Date();
+            var oldestMessage = new Date(currDate.setDate(currDate.getDate() - 20));
 
-            if(startOfWeek == null){
-                startOfWeek = 0;
+            if(lastChecked == null){
+                lastChecked = 0;
             } else {
-                startOfWeek = startOfWeek.getTime() / 1000;
+                lastChecked = lastChecked.getTime() / 1000;
             }
     
             var responseObject = {};
@@ -27,17 +29,29 @@ Message.announcements = function announcements(body, result){
     
             const response = await web.channels.history({
                 channel: settings.messageSource.channel,
-                oldest: startOfWeek
+                oldest: oldestMessage.getTime() / 1000
             });
             
             var lastestTs = 0;
+            responseObject.messages = [];
+
             for(let i = 0; i < response.messages.length; i++) {
                 let message = response.messages[i];
+                let messageObject = {};
                 if(message.user == settings.messageSource.admin) {
-                    responseObject.announcements += 1;
-                    if(message.ts > lastestTs) {
-                        lastestTs = message.ts;
+
+
+                    if(message.ts > lastChecked) {
+                        responseObject.announcements += 1;
+                        if(message.ts > lastestTs) {
+                            lastestTs = message.ts;
+                        }
                     }
+                    
+                    messageObject.date = new Date(message.ts * 1000);
+                    messageObject.message = message.text;
+
+                    responseObject.messages.push(messageObject);
                 }
             }
     
