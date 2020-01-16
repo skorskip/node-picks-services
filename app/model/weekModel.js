@@ -2,6 +2,8 @@
 var sql = require('./db.js');
 var config = require('../../config.json');
 var Team = require('./teamModel.js');
+var League = require('./leagueModel');
+
 
 var Week = function(week){
     this.number = week.number;
@@ -28,16 +30,25 @@ Week.getWeek = function getWeek(season, week, result){
 }
 
 Week.getCurrentWeek = function getCurrentWeek(req, result) {
-    var currDate = new Date();
-    var seasonStart = new Date(config.data.nflSeason, config.data.nflStartMonth, config.data.nflStartDay, config.data.nflStartTime, 0, 0);
-    var deltaDate = Math.abs(currDate - seasonStart);    
-    var currWeek = Math.floor(((deltaDate / (1000*60*60*24)) / 7)) + 1;
+    League.leagueSettings(function(err,settings){
+        if(err) result(err, null);
 
-    var currWeekObj = {};
-    currWeekObj.season = config.data.nflSeason;
-    currWeekObj.week = currWeek;
+        var currDate = new Date();
+        var seasonStart = new Date(settings.seasonStart);
+        var deltaDate = Math.abs(currDate - seasonStart);    
+        var currWeek = Math.floor(((deltaDate / (1000*60*60*24)) / 7)) + 1;
 
-    result(null, currWeekObj);
+
+        if(currWeek > settings.seasonEndWeek) {
+            currWeek = settings.seasonEndWeek;
+        }
+        
+        var currWeekObj = {};
+        currWeekObj.season = settings.currentSeason;
+        currWeekObj.week = currWeek;
+    
+        result(null, currWeekObj);
+    });
 }
 
 Week.getWeekSQL = function getWeekSQL(season, week, result) {
