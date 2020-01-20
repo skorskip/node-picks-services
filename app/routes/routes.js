@@ -4,6 +4,8 @@ module.exports = function(app) {
     var teams = require('../controller/teamController');
     var picks = require('../controller/pickController');
     var users = require('../controller/userController');
+    var league = require('../controller/leagueController');
+    var message = require('../controller/messageController');
 
 /*<---------GAMES---------->*/
     app.route('/games')
@@ -62,5 +64,16 @@ module.exports = function(app) {
         .post(users.login);
 
     app.route('/users/standings/:season')
-        .get(users.standings);
+        .get(users.standings)
+        .post(users.standingsByUser);
+
+/*<---------LEAGUE------------>*/
+    app.route('/league/settings')
+        .get(league.leagueSettings);
+
+/*<---------MESSAGING--------->*/
+
+    app.route('/message/announcements')
+        .post(message.announcements);
+
 };

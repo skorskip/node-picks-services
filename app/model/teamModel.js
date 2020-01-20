@@ -7,6 +7,7 @@ var Team = function(team){
     this.abbreviation       = team.abbreviation;
     this.primary_color      = team.primary_color;
     this.secondary_color    = team.secondary_color;
+    this.display_color      = team.display_color;
 };
 
 Team.getTeam = function getTeam(teamId, result) {

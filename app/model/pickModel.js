@@ -1,5 +1,7 @@
 'use strict'
 var sql = require('./db.js');
+var Team = require('./teamModel.js');
+var Game = require('./gameModel.js');
 
 var Pick = function(pick) {
     this.game_id        = pick.game_id;
@@ -9,7 +11,7 @@ var Pick = function(pick) {
 
 Pick.getUsersPicksByWeek = function getUsersPicksByWeek(userId, season, week, result) {
     sql.query(
-        "SELECT p.pick_id, p.game_id, p.team_id, p.user_id " +
+        "SELECT p.pick_id, p.game_id, p.team_id, p.user_id, g.away_team, g.home_team " +
         "FROM picks p, games g " + 
         "WHERE p.game_id = g.game_id " + 
         "AND g.season = ? " +
@@ -18,13 +20,17 @@ Pick.getUsersPicksByWeek = function getUsersPicksByWeek(userId, season, week, re
         "AND g.pick_submit_by_date < ?", [season, week, userId, new Date()], function(err, res){
         
         if(err) result(err, null);
-        else result(null, res);
+        else {
+            Pick.picksObjectMapper(res, function(mapppingErr, picksObject){
+                result(null, picksObject);
+            });
+        }
     });
 }
 
 Pick.getPicksByWeek = function getPicksByWeek(user, season, week, result) {
     sql.query(        
-        "SELECT p.pick_id, p.game_id, p.team_id, p.user_id " +
+        "SELECT p.pick_id, p.game_id, p.team_id, p.user_id, g.away_team, g.home_team " +
         "FROM picks p, games g, users u " + 
         "WHERE p.game_id = g.game_id " + 
         "AND g.season = ? " + 
@@ -34,7 +40,11 @@ Pick.getPicksByWeek = function getPicksByWeek(user, season, week, result) {
         "AND u.password = ?", [season, week, user.user_id, user.password], function(err, res) {
 
         if(err) result(err, null);
-        else result(null, res);
+        else {
+            Pick.picksObjectMapper(res, function(mapppingErr, picksObject){
+                result(null, picksObject);
+            });
+        }
     });
 }
 
@@ -114,6 +124,33 @@ Pick.checkPicksDateValid = function checkPicksDateValid(picks, result) {
         if(err) result(err, null);
         else result(null,res[0].count == 0);
     })
+}
+
+Pick.picksObjectMapper = function picksObjectMapper(picks, result) {
+
+    var teams = [];
+    var games  = [];
+
+    picks.forEach(pick => {
+        games.push(pick.game_id);
+        teams.push(pick.away_team);
+        teams.push(pick.home_team);
+    });
+
+    var pickObject = {};
+    pickObject.picks = picks;
+    pickObject.teams = [];
+    pickObject.games = [];
+
+    Team.getTeamsById(teams, function(err, teamObjects){
+        if(err){}
+        pickObject.teams = teamObjects;
+        Game.getGamesById(games, function(err, gameObjects){
+            if(err){}
+            pickObject.games = gameObjects;
+            result(null, pickObject);
+        });
+    });    
 }
 
 module.exports = Pick;

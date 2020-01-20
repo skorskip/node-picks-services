@@ -1,6 +1,9 @@
 'user strict';
 var sql = require('./db.js');
-var config = require('../../config.json')
+var config = require('../../config.json');
+var Team = require('./teamModel.js');
+var League = require('./leagueModel');
+
 
 var Week = function(week){
     this.number = week.number;
@@ -19,29 +22,33 @@ Week.getWeek = function getWeek(season, week, result){
 
     getWeekSQL.then(function(data, err) {
         if(err) result(err, null);
-        
-        var teams = [];
-        if(data.length > 0) {
-            data.forEach(game => {
-                teams.push(game.away_team);
-                teams.push(game.home_team);
-            });
-        }
-        result(null, Week.weekMapper(data, season, week, teams));
+        Week.weekMapper(data, season, week, function(errMapping, weekObject){
+            if(errMapping) result(errMapping, null);
+            result(null, weekObject);
+        });
     });
 }
 
 Week.getCurrentWeek = function getCurrentWeek(req, result) {
-    var currDate = new Date();
-    var seasonStart = new Date(config.data.nflSeason, config.data.nflStartMonth, config.data.nflStartDay, config.data.nflStartTime, 0, 0);
-    var deltaDate = Math.abs(currDate - seasonStart);    
-    var currWeek = Math.floor(((deltaDate / (1000*60*60*24)) / 7)) + 1;
+    League.leagueSettings(function(err,settings){
+        if(err) result(err, null);
 
-    var currWeekObj = {};
-    currWeekObj.season = config.data.nflSeason;
-    currWeekObj.week = currWeek;
+        var currDate = new Date();
+        var seasonStart = new Date(settings.seasonStart);
+        var deltaDate = Math.abs(currDate - seasonStart);    
+        var currWeek = Math.floor(((deltaDate / (1000*60*60*24)) / 7)) + 1;
 
-    result(null, currWeekObj);
+
+        if(currWeek > settings.seasonEndWeek) {
+            currWeek = settings.seasonEndWeek;
+        }
+        
+        var currWeekObj = {};
+        currWeekObj.season = settings.currentSeason;
+        currWeekObj.week = currWeek;
+    
+        result(null, currWeekObj);
+    });
 }
 
 Week.getWeekSQL = function getWeekSQL(season, week, result) {
@@ -54,13 +61,25 @@ Week.getWeekSQL = function getWeekSQL(season, week, result) {
     });
 };
 
-Week.weekMapper = function(games, season, week, teams) {
+Week.weekMapper = function(games, season, week, result) {
     var weekObject = {};
     weekObject.games = games;
     weekObject.number = week;
     weekObject.season = season;
-    weekObject.teams = teams;
-    return weekObject;
+    
+    var teams = [];
+    if(games.length > 0) {
+        games.forEach(game => {
+            teams.push(game.away_team);
+            teams.push(game.home_team);
+        });
+    }
+
+    Team.getTeamsById(teams, function(err, teams){
+        if(err) result(err, null);
+        weekObject.teams = teams;
+        result(null, weekObject);
+    });
 };
 
 module.exports= Week;
