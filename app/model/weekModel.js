@@ -32,20 +32,10 @@ Week.getWeek = function getWeek(season, week, result){
 Week.getCurrentWeek = function getCurrentWeek(req, result) {
     League.leagueSettings(function(err,settings){
         if(err) result(err, null);
-
-        var currDate = new Date();
-        var seasonStart = new Date(settings.seasonStart);
-        var deltaDate = Math.abs(currDate - seasonStart);    
-        var currWeek = Math.floor(((deltaDate / (1000*60*60*24)) / 7)) + 1;
-
-
-        if(currWeek > settings.seasonEndWeek) {
-            currWeek = settings.seasonEndWeek;
-        }
-        
+                
         var currWeekObj = {};
         currWeekObj.season = settings.currentSeason;
-        currWeekObj.week = currWeek;
+        currWeekObj.week = settings.currentWeek;
     
         result(null, currWeekObj);
     });

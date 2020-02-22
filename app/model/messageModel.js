@@ -27,7 +27,7 @@ Message.announcements = function announcements(body, result){
             responseObject.announcements = 0;
             responseObject.announcement_date = new Date();
     
-            const response = await web.channels.history({
+            const response = await web.conversations.history({
                 channel: settings.messageSource.channel,
                 oldest: oldestMessage.getTime() / 1000
             });
