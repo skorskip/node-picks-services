@@ -48,6 +48,40 @@ Pick.getPicksByWeek = function getPicksByWeek(user, season, week, result) {
     });
 }
 
+Pick.getWeekPicksByGame = function getWeekPicksByGame(season, week, result) {
+    let weekPicksObject = {};
+    let promises_array = [];
+
+    sql.query(
+        "SELECT * FROM games g " +
+        "WHERE g.week = ? " + 
+        "AND g.season = ?", [week, season], function(err, res) {
+
+        if(err) result(err, null);
+        else {
+            res.forEach(game => {
+                promises_array.push(new Promise((resolve, reject) => {
+                    Pick.getPicksByGame(game.game_id, function(errPickByGame, picksByGameRes){
+                        if(errPickByGame) {
+                            result(err, null);
+                            reject();
+
+                        }
+                        else {
+                            weekPicksObject[game.game_id] = picksByGameRes;
+                            resolve();
+                        }
+                    });
+                }));
+            });
+
+            Promise.all(promises_array).then(()=>{
+                return result(null, weekPicksObject);
+            });
+        }
+    });
+}
+
 Pick.getPicksByGame = function getPicksByGame(gameId, result) {
     sql.query(
         "SELECT p.pick_id, p.game_id, p.team_id, p.user_id, u.user_inits, u.first_name, u.last_name " +

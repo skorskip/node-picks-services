@@ -21,7 +21,7 @@ module.exports = function(app) {
         .get(week.getCurrentWeek);
 
     app.route('/weeks/season/:season/week/:week')
-        .get(week.getWeek);
+        .post(week.getWeek);
 
 /*<---------TEAMS---------->*/
     app.route('/teams')
@@ -51,6 +51,9 @@ module.exports = function(app) {
 
     app.route('/picks/game/:gameId')
         .get(picks.getPicksByGame);
+
+    app.route('/picks/games/season/:season/week/:week')
+        .get(picks.getWeekPicksByGame);
 
 /*<---------USERS------------>*/
     app.route('/users/:id')

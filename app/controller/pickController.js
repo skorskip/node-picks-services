@@ -16,6 +16,13 @@ exports.getPicksByWeek = function(req, res) {
     });
 };
 
+exports.getWeekPicksByGame = function(req, res) {
+    Pick.getWeekPicksByGame(req.params.season, req.params.week, function(err, picks) {
+        if(err) res.send(err);
+        res.json(picks);
+    });
+};
+
 exports.getPicksByGame = function(req, res) {
     Pick.getPicksByGame(req.params.gameId, function(err, picks) {
         if(err) res.send(err);
