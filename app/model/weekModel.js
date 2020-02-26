@@ -12,9 +12,9 @@ var Week = function(week){
     this.teams = week.teams;
 };
 
-Week.getWeek = function getWeek(season, week, result){
+Week.getWeek = function getWeek(season, week, user, result){
     var getWeekSQL = new Promise((resolve, reject) => {
-        Week.getWeekSQL(season, week, function(err, data){
+        Week.getWeekSQL(season, week, user, function(err, data){
             if(err) reject(result(err, null));  
             resolve(data);
         });
@@ -41,8 +41,23 @@ Week.getCurrentWeek = function getCurrentWeek(req, result) {
     });
 }
 
-Week.getWeekSQL = function getWeekSQL(season, week, result) {
-    sql.query("SELECT * FROM games where season = ? AND week = ? AND home_spread is not NULL ORDER BY start_time", [season, week], function(err, data){
+Week.getWeekSQL = function getWeekSQL(season, week, user, result) {
+    sql.query(
+        "SELECT * FROM games " +
+        "WHERE season = ? " + 
+        "AND week = ? " + 
+        "AND home_spread is not NULL " +
+        "AND game_id NOT IN (" +
+            "SELECT p.game_id " +
+            "FROM picks p, users u, games g " +
+            "WHERE g.game_id = p.game_id " + 
+            "AND g.season = ? " + 
+            "AND g.week = ? " +
+            "AND p.user_id = u.user_id " +
+            "AND u.user_id = ? " +
+            "AND u.password = ?)" + 
+        "ORDER BY start_time", [season, week, season, week, user.user_id, user.password], function(err, data){
+        
         if(err) { 
             result(err, null);
         } else {
