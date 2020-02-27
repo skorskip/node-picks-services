@@ -63,7 +63,7 @@ User.standings = function standings(season, result) {
     sql.query(
         'select rank() over(order by wins desc, tie_breaks desc) as ranking, results.* ' +
         'from ' + 
-        '(select season, r.user_id, u.user_inits, user_name, sum(wins) as wins, sum(picks) as picks, round(sum(wins)/sum(picks),3) as win_pct, sum(tie_breaks) as tie_breaks, sum(bonus_amt) as bonus_amt ' +
+        '(select season, r.user_id, u.user_inits, user_name, u.first_name, u.last_name, sum(wins) as wins, sum(picks) as picks, round(sum(wins)/sum(picks),3) as win_pct, sum(tie_breaks) as tie_breaks, sum(bonus_amt) as bonus_amt ' +
         'from rpt_weekly_user_stats r, users u ' +
         'where r.user_id = u.user_id ' +
         'and week <= 17 ' +
@@ -76,7 +76,7 @@ User.standings = function standings(season, result) {
 
 User.standingsByUser = function standingsByUser(season, user, result) {
     sql.query(
-        'SELECT r.user_id, u.user_inits, user_name, first_name, last_name, sum(wins) as wins, sum(picks) as picks, round(sum(wins)/sum(picks),3) as win_pct ' +
+        'SELECT r.user_id, u.user_inits, u.user_name, u.first_name, u.last_name, sum(wins) as wins, sum(picks) as picks, round(sum(wins)/sum(picks),3) as win_pct ' +
         'FROM rpt_weekly_user_stats r, users u ' +
         'WHERE r.user_id = u.user_id AND season = ? ' +
         'AND r.user_id = ? ' +
