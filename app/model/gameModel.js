@@ -20,20 +20,6 @@ var Game = function(game){
     this.seconds_left_in_quarter    = game.seconds_left_in_quarter;
 };
 
-Game.addGame = function addGame(newGame, result) {    
-    sql.query("INSERT INTO games set ?", newGame, function (err, res) {
-        if(err) result(err, null);
-        else result(null, res.insertId);
-    });           
-};
-
-Game.getGameById = function getGameById(gameId, result) {
-    sql.query("SELECT * from games where game_id = ? ORDER BY pick_submit_by_date ASC", gameId, function (err, res) {             
-        if(err)result(err, null);
-        else result(null, res);
-    });   
-};
-
 Game.getGamesById = function getGamesById(listGameIds, result) {
     if(listGameIds.length > 0) {
         sql.query("Select * from games where game_id in (?) ORDER BY start_time", [listGameIds], function (err, res) {
@@ -43,20 +29,6 @@ Game.getGamesById = function getGamesById(listGameIds, result) {
     } else {
         result(null, []);
     }
-};
-
-Game.updateById = function(id, game, result){
-    sql.query("UPDATE games SET ? WHERE game_id = ?", [game,id], function (err, res) {
-        if(err) result(err, null);
-        else result(null, res);
-    }); 
-};
-
-Game.remove = function(id, result){
-    sql.query("DELETE FROM games WHERE game_id = ?", [id], function (err, res) {
-        if(err) result(err, null);
-        else result(null, res);
-    }); 
 };
 
 module.exports= Game;

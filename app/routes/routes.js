@@ -1,20 +1,9 @@
 module.exports = function(app) {
-    var games = require('../controller/gameController');
     var week = require('../controller/weekController');
-    var teams = require('../controller/teamController');
     var picks = require('../controller/pickController');
     var users = require('../controller/userController');
     var league = require('../controller/leagueController');
     var message = require('../controller/messageController');
-
-/*<---------GAMES---------->*/
-    app.route('/games')
-        .post(games.getGamesById);
-    
-    app.route('/games/:gameId')
-        .get(games.getGame)
-        .put(games.updateGame)
-        .delete(games.deleteGame);
         
 /*<---------WEEKS---------->*/
     app.route('/weeks/current')
@@ -22,17 +11,6 @@ module.exports = function(app) {
 
     app.route('/weeks/season/:season/week/:week')
         .post(week.getWeek);
-
-/*<---------TEAMS---------->*/
-    app.route('/teams')
-        .get(teams.getAllTeams)
-        .post(teams.getTeamsById);
-
-    app.route('/teams/:teamId')
-        .get(teams.getTeam);
-
-    app.route('/teams/abbrv/:teamAbbrev')
-        .get(teams.getTeamByAbbrev);
 
 /*<---------PICKS----------->*/
     app.route('/picks/user/:userId/season/:season/week/:week')
@@ -48,9 +26,6 @@ module.exports = function(app) {
         .get(picks.getPick)
         .put(picks.updatePick)
         .delete(picks.deletePick);
-
-    app.route('/picks/game/:gameId')
-        .get(picks.getPicksByGame);
 
     app.route('/picks/games/season/:season/week/:week')
         .get(picks.getWeekPicksByGame);

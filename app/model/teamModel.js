@@ -10,27 +10,6 @@ var Team = function(team){
     this.display_color      = team.display_color;
 };
 
-Team.getTeam = function getTeam(teamId, result) {
-    sql.query("SELECT * FROM teams where team_id = ? ", teamId, function(err, res){
-        if(err) result(err, null);
-        else result(null, res);
-    });
-};
-
-Team.getAllTeams = function getAllTeams(req, result) {
-    sql.query("SELECT * FROM teams", req, function(err, res){
-        if(err) result(err, null);
-        else result(null, res);
-    });
-};
-
-Team.getTeamByAbbrev = function getTeamByAbbrev(teamAbbrev, result) {
-    sql.query("SELECT * FROM teams where abbreviation = ?", teamAbbrev, function(err, res){
-        if(err) result(err, null);
-        else result(null,res);
-    });
-};
-
 Team.getTeamsById = function getTeamsById(teamIds, result) {
     if(teamIds.length > 0) {
         sql.query("SELECT * FROM teams WHERE team_id in (?)", [teamIds], function(err, res){
